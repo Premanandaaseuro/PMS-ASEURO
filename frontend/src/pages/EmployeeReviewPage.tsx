@@ -67,6 +67,11 @@ export const EmployeeReviewPage: React.FC<EmployeeReviewPageProps> = ({
           type: 'error',
           message: 'Access Denied: This employee is not assigned to you for evaluation.',
         });
+      } else if (err instanceof ApiError && err.status === 404) {
+        setAlert({
+          type: 'warning',
+          message: 'No active PMS assignment found for this employee in the current cycle. HR has not initiated evaluation for this employee yet.',
+        });
       } else {
         setAlert({
           type: 'error',

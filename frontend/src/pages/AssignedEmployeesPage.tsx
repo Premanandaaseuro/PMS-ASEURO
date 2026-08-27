@@ -157,18 +157,24 @@ export const AssignedEmployeesPage: React.FC<AssignedEmployeesPageProps> = ({ on
                       <StatusBadge status={emp.pmsStatus} />
                     </td>
                     <td style={{ textAlign: 'right' }}>
-                      <button
-                        type="button"
-                        className={`btn ${isAwaitingManager ? 'btn-primary' : 'btn-secondary'} btn-sm`}
-                        onClick={() =>
-                          onSelectEmployee
-                            ? onSelectEmployee(emp.employeeId, emp.assignmentId || 0)
-                            : navigate(`/assigned-employees/${emp.employeeId}/review`)
-                        }
-                      >
-                        <span>{emp.managerReviewSubmitted ? 'View Review' : 'Review PMS'}</span>
-                        <ChevronRight size={15} />
-                      </button>
+                      {emp.pmsStatus === 'NOT_ASSIGNED' || !emp.assignmentId ? (
+                        <span style={{ fontSize: '0.82rem', color: 'var(--color-dark-muted)', fontStyle: 'italic', paddingRight: '0.5rem' }}>
+                          Awaiting Cycle Setup
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          className={`btn ${isAwaitingManager ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                          onClick={() =>
+                            onSelectEmployee
+                              ? onSelectEmployee(emp.employeeId, emp.assignmentId || 0)
+                              : navigate(`/assigned-employees/${emp.employeeId}/review`)
+                          }
+                        >
+                          <span>{emp.managerReviewSubmitted ? 'View Review' : 'Review PMS'}</span>
+                          <ChevronRight size={15} />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 );

@@ -41,11 +41,18 @@ export const MyKpisPage: React.FC = () => {
         };
       });
       setRatingsState(initialRatings);
-    } catch (err) {
-      setAlert({
-        type: 'error',
-        message: err instanceof Error ? err.message : 'Failed to load active KPIs.',
-      });
+    } catch (err: unknown) {
+      const status = (err as { status?: number; errorData?: { status?: number } })?.status ||
+                     (err as { errorData?: { status?: number } })?.errorData?.status;
+      if (status === 404) {
+        // Graceful empty state when no active cycle is assigned to this manager yet
+        setPmsData(null);
+      } else {
+        setAlert({
+          type: 'error',
+          message: err instanceof Error ? err.message : 'Failed to load active KPIs.',
+        });
+      }
     } finally {
       setIsLoading(false);
     }
