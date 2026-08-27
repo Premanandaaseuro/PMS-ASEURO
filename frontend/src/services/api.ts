@@ -50,8 +50,9 @@ export async function request<T>(endpoint: string, options: RequestInit = {}): P
 
       if (response.status === 401 && !endpoint.includes('/auth/login')) {
         localStorage.removeItem('pms_jwt_token');
+        localStorage.removeItem('pms_token');
         localStorage.removeItem('pms_user');
-        window.location.href = '/login';
+        window.location.reload();
       }
 
       throw new ApiError(errorData);
