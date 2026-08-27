@@ -92,16 +92,21 @@ public class DatabaseSeeder implements ApplicationRunner {
 
     private void seedHrUser() {
         String hrEmail = "aishwarya.logaraj@aseuro.in";
-        if (userRepository.findByEmailIgnoreCase(hrEmail).isEmpty()) {
+        User savedUser = userRepository.findByEmailIgnoreCase(hrEmail).orElse(null);
+        if (savedUser == null) {
             User hrUser = new User();
             hrUser.setUsername("aishwarya.logaraj");
             hrUser.setEmail(hrEmail);
             hrUser.setPasswordHash(passwordEncoder.encode("Aseuro@123"));
             hrUser.setRole(UserRole.HR);
             hrUser.setStatus(RecordStatus.ACTIVE);
-            User savedUser = userRepository.save(hrUser);
+            savedUser = userRepository.save(hrUser);
+            log.info("Provisioned HR Administrator account: {}", hrEmail);
+        }
 
-            // Also create employee profile for HR
+        // Also create employee profile for HR if not present
+        if (employeeRepository.findByEmailIgnoreCase(hrEmail).isEmpty() &&
+            employeeRepository.findByEmployeeCodeIgnoreCase("HR-001").isEmpty()) {
             Department hrDept = departmentRepository.findByNameIgnoreCase("Human Resources").orElse(null);
             Designation hrRole = designationRepository.findByNameIgnoreCase("HR Lead").orElse(null);
 
@@ -115,8 +120,6 @@ public class DatabaseSeeder implements ApplicationRunner {
             hrEmp.setJoiningDate(LocalDate.of(2023, 1, 15));
             hrEmp.setStatus(RecordStatus.ACTIVE);
             employeeRepository.save(hrEmp);
-
-            log.info("Provisioned HR Administrator account: {}", hrEmail);
         }
     }
 
@@ -127,18 +130,25 @@ public class DatabaseSeeder implements ApplicationRunner {
 
         // 1. Seed Manager
         String mgrEmail = "manager@aseuro.in";
-        Employee savedMgr = null;
-        if (userRepository.findByEmailIgnoreCase(mgrEmail).isEmpty()) {
+        User savedMgrUser = userRepository.findByEmailIgnoreCase(mgrEmail).orElse(null);
+        if (savedMgrUser == null) {
             User mgrUser = new User();
             mgrUser.setUsername("rajesh.manager");
             mgrUser.setEmail(mgrEmail);
             mgrUser.setPasswordHash(passwordEncoder.encode("Manager@123"));
             mgrUser.setRole(UserRole.MANAGER);
             mgrUser.setStatus(RecordStatus.ACTIVE);
-            User saved = userRepository.save(mgrUser);
+            savedMgrUser = userRepository.save(mgrUser);
+            log.info("Provisioned Manager account: {}", mgrEmail);
+        }
 
+        Employee savedMgr = employeeRepository.findByEmailIgnoreCase(mgrEmail)
+                .or(() -> employeeRepository.findByEmployeeCodeIgnoreCase("MGR-101"))
+                .orElse(null);
+
+        if (savedMgr == null) {
             Employee mgrEmp = new Employee();
-            mgrEmp.setUser(saved);
+            mgrEmp.setUser(savedMgrUser);
             mgrEmp.setEmployeeCode("MGR-101");
             mgrEmp.setFullName("Rajesh Sharma");
             mgrEmp.setEmail(mgrEmail);
@@ -147,24 +157,26 @@ public class DatabaseSeeder implements ApplicationRunner {
             mgrEmp.setJoiningDate(LocalDate.of(2022, 6, 1));
             mgrEmp.setStatus(RecordStatus.ACTIVE);
             savedMgr = employeeRepository.save(mgrEmp);
-            log.info("Provisioned Manager account: {}", mgrEmail);
-        } else {
-            savedMgr = employeeRepository.findByEmailIgnoreCase(mgrEmail).orElse(null);
         }
 
         // 2. Seed Employee
         String empEmail = "employee@aseuro.in";
-        if (userRepository.findByEmailIgnoreCase(empEmail).isEmpty()) {
+        User savedEmpUser = userRepository.findByEmailIgnoreCase(empEmail).orElse(null);
+        if (savedEmpUser == null) {
             User empUser = new User();
             empUser.setUsername("kiran.employee");
             empUser.setEmail(empEmail);
             empUser.setPasswordHash(passwordEncoder.encode("Employee@123"));
             empUser.setRole(UserRole.EMPLOYEE);
             empUser.setStatus(RecordStatus.ACTIVE);
-            User saved = userRepository.save(empUser);
+            savedEmpUser = userRepository.save(empUser);
+            log.info("Provisioned Employee account: {}", empEmail);
+        }
 
+        if (employeeRepository.findByEmailIgnoreCase(empEmail).isEmpty() &&
+            employeeRepository.findByEmployeeCodeIgnoreCase("EMP-201").isEmpty()) {
             Employee emp = new Employee();
-            emp.setUser(saved);
+            emp.setUser(savedEmpUser);
             emp.setEmployeeCode("EMP-201");
             emp.setFullName("Kiran Kumar");
             emp.setEmail(empEmail);
@@ -174,7 +186,6 @@ public class DatabaseSeeder implements ApplicationRunner {
             emp.setJoiningDate(LocalDate.of(2024, 2, 10));
             emp.setStatus(RecordStatus.ACTIVE);
             employeeRepository.save(emp);
-            log.info("Provisioned Employee account: {}", empEmail);
         }
     }
 }

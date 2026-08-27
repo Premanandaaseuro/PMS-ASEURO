@@ -35,32 +35,6 @@ public class DashboardController {
         ));
     }
 
-    @GetMapping("/manager/dashboard")
-    @PreAuthorize("hasRole('MANAGER')")
-    public ResponseEntity<Map<String, Object>> managerDashboard(@AuthenticationPrincipal User principal) {
-        Employee manager = employeeRepository.findByUserId(principal.getId()).orElse(null);
-        List<Employee> assignedEmployees = manager != null ? employeeRepository.findByManagerId(manager.getId()) : List.of();
-
-        List<Map<String, String>> teamList = assignedEmployees.stream()
-                .map(e -> Map.of(
-                        "name", e.getFullName(),
-                        "code", e.getEmployeeCode(),
-                        "email", e.getEmail(),
-                        "status", e.getStatus().name()
-                ))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(Map.of(
-                "role", "MANAGER",
-                "email", principal.getEmail(),
-                "managerName", manager != null ? manager.getFullName() : "Manager",
-                "title", "Manager Performance Workspace",
-                "message", "Login verified from the database. Assigned team members and review cycles appear here.",
-                "teamCount", teamList.size(),
-                "teamMembers", teamList
-        ));
-    }
-
     @GetMapping("/employee/dashboard")
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<Map<String, Object>> employeeDashboard(@AuthenticationPrincipal User principal) {

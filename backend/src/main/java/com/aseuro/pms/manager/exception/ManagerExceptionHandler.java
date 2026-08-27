@@ -1,15 +1,5 @@
 package com.aseuro.pms.manager.exception;
 
-import com.aseuro.pms.entity.User;
-import com.aseuro.pms.entity.Employee;
-import com.aseuro.pms.entity.Department;
-import com.aseuro.pms.entity.Designation;
-import com.aseuro.pms.entity.Team;
-import com.aseuro.pms.entity.RecordStatus;
-import com.aseuro.pms.entity.UserRole;
-import com.aseuro.pms.repository.EmployeeRepository;
-import com.aseuro.pms.repository.UserRepository;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -26,10 +16,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.ArrayList;
 import java.util.List;
 
-@RestControllerAdvice
-public class GlobalExceptionHandler {
+@RestControllerAdvice(basePackages = "com.aseuro.pms.manager")
+public class ManagerExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ManagerExceptionHandler.class);
 
     @ExceptionHandler(PmsException.class)
     public ResponseEntity<ApiErrorResponse> handlePmsException(PmsException ex) {
@@ -123,4 +113,3 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
-
