@@ -1,9 +1,9 @@
-export type UserRole = 'HR' | 'MANAGER' | 'EMPLOYEE';
+export * from './types/index';
 
 export interface AuthUser {
   token: string;
   email: string;
-  role: UserRole;
+  role: 'HR' | 'MANAGER' | 'EMPLOYEE';
   fullName: string;
   employeeCode: string;
 }
@@ -36,7 +36,7 @@ export interface EmployeeRecord {
   employeeCode: string;
   fullName: string;
   email: string;
-  role: UserRole;
+  role: 'HR' | 'MANAGER' | 'EMPLOYEE';
   departmentId: number;
   departmentName: string;
   designationId: number;
